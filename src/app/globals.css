@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body{
+    @apply flex justify-center
+}
+
+input, select {
+    @apply w-full px-4 py-2 rounded-md border focus:outline-none focus:ring focus:border-blue-300 bg-white;
+}
+  
+  /* Style the button */
+  button {
+    @apply px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300 ;
+  }
