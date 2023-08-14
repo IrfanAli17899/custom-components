@@ -6,18 +6,16 @@ import Input from '@src/components/Input';
 import Form from '@src/components/Form';
 import Select from '@src/components/Select';
 import Modal, { ModalHandle } from '@src/components/Modal';
+// import DynamicComponent from '@src/components/DynamicComponent';
 
 interface FormData {
   firstName: string;
   category: string;
-  remember: boolean
 }
 
 const validationSchema = yup.object().shape({
   firstName: yup.string().required('First name is required'),
   category: yup.string().required('Category is required'),
-  remember: yup.boolean().required(),
-
 });
 
 
@@ -41,9 +39,17 @@ const MyForm: React.FC = () => {
 
   return (
     <div>
-
-      <Form onSubmit={onSubmit} validationSchema={validationSchema}>
+      <Form onSubmit={onSubmit} mode='onChange' validationSchema={validationSchema}>
         <Input name='firstName' placeholder="First Name" />
+        {/* <DynamicComponent
+            tag="input"
+
+          // name='firstName'
+          
+          // type='password'
+          placeholder="First Name"
+
+        /> */}
         <Select
           name='category'
           options={[

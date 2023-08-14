@@ -1,7 +1,8 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect, useRef } from 'react';
 import { useForm, SubmitHandler, FieldValues, UseFormProps, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import { isEmpty } from '@src/utils/objectUtils';
 
 export interface FormProps<T extends FieldValues> extends UseFormProps<T> {
     children: ReactNode;
@@ -20,6 +21,24 @@ const Form = <T extends FieldValues>({
         resolver: yupResolver(validationSchema),
         ...rest,
     });
+
+    const { handleSubmit, watch } = methods;
+
+    const watchedFields = watch();
+
+    const prevWatchedFields = useRef(watchedFields);
+
+    useEffect(() => {
+        if (rest.mode !== "onSubmit") {
+            const fieldsChanged = Object.keys(watchedFields).some(field =>
+                watchedFields[field] !== prevWatchedFields.current[field]
+            );
+            if (fieldsChanged) {
+                prevWatchedFields.current = watchedFields;
+                handleSubmit(onSubmit)();
+            }
+        }
+    }, [rest.mode, watchedFields, handleSubmit, onSubmit]);
 
     return (
         <FormProvider {...methods}>
