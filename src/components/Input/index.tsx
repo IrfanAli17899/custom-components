@@ -2,13 +2,14 @@ import { ErrorMessage } from '@hookform/error-message';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useConditionalForm } from '@src/hooks/useConditionalForm';
 import React, { useEffect, useRef } from 'react';
-import { FieldValues, Path, SubmitHandler } from 'react-hook-form';
+import { FieldErrors, FieldValues, Mode, Path, SubmitErrorHandler, SubmitHandler } from 'react-hook-form';
 import * as yup from 'yup';
 
 export interface InputProps<T extends FieldValues> extends React.InputHTMLAttributes<HTMLInputElement> {
     name: string;
+    mode?: Mode
     validationSchema?: yup.ObjectSchema<T>;
-    onValueChange?: SubmitHandler<T>
+    onValueChange?: (data: T | null, errors: FieldErrors<T> | null) => void
 }
 
 const Input = <T extends FieldValues>({
@@ -17,7 +18,7 @@ const Input = <T extends FieldValues>({
     ...rest
 }: InputProps<T>) => {
     const [{ register, formState, watch, handleSubmit }, inFormContext] = useConditionalForm<T>({
-        ...(validationSchema && { resolver: yupResolver(validationSchema), mode: 'onChange' })
+        ...(validationSchema && { resolver: yupResolver(validationSchema), mode: rest.mode || 'onChange' })
     });
 
     if (inFormContext && validationSchema) {
@@ -36,10 +37,18 @@ const Input = <T extends FieldValues>({
             );
             if (fieldsChanged) {
                 prevWatchedFields.current = watchedFields;
-                handleSubmit(onValueChange)();
+                handleSubmit(onSubmit, onError)();
             }
         }
     }, [inFormContext, watchedFields, handleSubmit, onValueChange]);
+
+    const onSubmit: SubmitHandler<T> = (data) => {
+        onValueChange?.(data, null)
+    }
+
+    const onError: SubmitErrorHandler<T> = (errors) => {
+        onValueChange?.(null, errors);
+    }
 
     return (
         <div className="form-item">

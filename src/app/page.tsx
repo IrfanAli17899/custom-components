@@ -3,19 +3,19 @@ import React, { useRef } from 'react';
 import * as yup from 'yup';
 import { SubmitHandler } from 'react-hook-form';
 import Input from '@src/components/Input';
-import Form from '@src/components/Form';
+import Form, { FormProps } from '@src/components/Form';
 import Select from '@src/components/Select';
 import Modal, { ModalHandle } from '@src/components/Modal';
 // import DynamicComponent from '@src/components/DynamicComponent';
 
 interface FormData {
   firstName: string;
-  category: string;
+  // category: string;
 }
 
 const validationSchema = yup.object().shape({
   firstName: yup.string().required('First name is required'),
-  category: yup.string().required('Category is required'),
+  // category: yup.string().required('Category is required'),
 });
 
 
@@ -29,13 +29,13 @@ const MyForm: React.FC = () => {
     }
   };
 
-  const onSubmit: SubmitHandler<FormData> = (data) => {
-    console.log(data);
+  const onSubmit: FormProps<FormData>["onSubmit"] = (data, errors) => {
+    console.log(data, errors);
   };
 
-  // return(
-  //     <Input name='firstName' validationSchema={validationSchema} />
-  // )
+  return (
+    <Input name='firstName' onValueChange={console.log} validationSchema={validationSchema} />
+  )
 
   return (
     <div>
@@ -50,13 +50,13 @@ const MyForm: React.FC = () => {
           placeholder="First Name"
 
         /> */}
-        <Select
+        {/* <Select
           name='category'
           options={[
             { label: 'cloth', value: 'cloth' },
             { label: 'gadgets', value: 'gadgets' },
           ]}
-        />
+        /> */}
         <button type="submit">Submit</button>
       </Form>
 

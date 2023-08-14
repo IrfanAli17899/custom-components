@@ -1,12 +1,12 @@
 import React, { ReactNode, useEffect, useRef } from 'react';
-import { useForm, SubmitHandler, FieldValues, UseFormProps, FormProvider } from 'react-hook-form';
+import { useForm, SubmitHandler, FieldValues, UseFormProps, FormProvider, FieldErrors, SubmitErrorHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { isEmpty } from '@src/utils/objectUtils';
 
 export interface FormProps<T extends FieldValues> extends UseFormProps<T> {
     children: ReactNode;
-    onSubmit: SubmitHandler<T>;
+    onSubmit: (data: T | null, errors: FieldErrors<T> | null) => void;
     validationSchema: yup.ObjectSchema<T>;
 }
 
@@ -35,14 +35,22 @@ const Form = <T extends FieldValues>({
             );
             if (fieldsChanged) {
                 prevWatchedFields.current = watchedFields;
-                handleSubmit(onSubmit)();
+                handleSubmit(_onSubmit, _onError)();
             }
         }
     }, [rest.mode, watchedFields, handleSubmit, onSubmit]);
 
+    const _onSubmit: SubmitHandler<T> = (data) => {
+        onSubmit?.(data, null)
+    }
+
+    const _onError: SubmitErrorHandler<T> = (errors) => {
+        onSubmit?.(null, errors);
+    }
+
     return (
         <FormProvider {...methods}>
-            <form onSubmit={methods.handleSubmit(onSubmit)}>
+            <form onSubmit={methods.handleSubmit(_onSubmit, _onError)}>
                 {children}
             </form>
         </FormProvider>
